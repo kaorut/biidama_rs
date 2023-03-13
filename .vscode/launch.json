@@ -1,0 +1,42 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'biidama_rs'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=biidama_rs",
+                    "--package=biidama_rs"
+                ],
+                "filter": {
+                    "name": "biidama_rs",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'biidama_rs'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=biidama_rs",
+                    "--package=biidama_rs"
+                ],
+                "filter": {
+                    "name": "biidama_rs",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
