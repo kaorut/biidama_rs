@@ -9,6 +9,7 @@ struct Biidama {
 
 struct Model {
     biidamas: Vec<Biidama>,
+    fps: usize,
 }
 
 fn main() {
@@ -29,7 +30,16 @@ fn model(_app: &App) -> Model {
         velocity: Vec2::new(20.0, -1.0),
         color: Rgba::new(0.0, 0.0, 1.0, 0.5),
     });
-    return Model { biidamas: biidamas };
+    biidamas.push(Biidama {
+        position: Vec2::new(20.0, 50.0),
+        radius: 30.0,
+        velocity: Vec2::new(4.0, -13.0),
+        color: Rgba::new(1.0, 0.0, 1.0, 0.5),
+    });
+    return Model {
+        biidamas: biidamas,
+        fps: 0,
+    };
 }
 
 fn update(_app: &App, _model: &mut Model, _update: Update) {
@@ -53,6 +63,17 @@ fn update(_app: &App, _model: &mut Model, _update: Update) {
             frame_rect.top(),
         );
     }
+    for i in 0.._model.biidamas.len() - 1 {
+        for j in i + 1.._model.biidamas.len() {
+            let b1 = &_model.biidamas[i];
+            let b2 = &_model.biidamas[j];
+            if collided(b1, b2) {
+                println!("collided: {} - {}", i, j);
+            }
+        }
+    }
+
+    _model.fps = (1.0 / _update.since_last.as_secs_f32()) as usize;
 }
 
 fn reflect_on_wall(
@@ -79,8 +100,16 @@ fn reflect_on_wall(
     }
 }
 
+fn collided(biidama1: &Biidama, biidama2: &Biidama) -> bool {
+    let squared_distance = (biidama1.position.x - biidama2.position.x)
+        * (biidama1.position.x - biidama2.position.x)
+        + (biidama1.position.y - biidama2.position.y) * (biidama1.position.y - biidama2.position.y);
+    return squared_distance < biidama1.radius + biidama2.radius;
+}
+
 fn view(app: &App, _model: &Model, frame: Frame) {
     let draw = app.draw();
+    let window_rect = app.window_rect();
     draw.background().color(WHITE);
 
     for b in &_model.biidamas {
@@ -88,11 +117,15 @@ fn view(app: &App, _model: &Model, frame: Frame) {
             .x_y(b.position.x, b.position.y)
             .w_h(b.radius * 2.0, b.radius * 2.0)
             .color(b.color);
-        draw.ellipse()
-            .x_y(b.position.x, b.position.y)
-            .w_h(10.0, 10.0)
-            .color(BLACK);
     }
+
+    let text_area = Rect::from_w_h(window_rect.w(), 24.0).top_left_of(window_rect.pad(0.0));
+    draw.text(std::format!("FPS: {}", _model.fps).as_str())
+        .color(BLACK)
+        .left_justify()
+        .xy(text_area.xy())
+        .wh(text_area.wh())
+        .finish();
 
     draw.to_frame(app, &frame).unwrap();
 }
