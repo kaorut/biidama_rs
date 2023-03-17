@@ -22,19 +22,13 @@ fn model(_app: &App) -> Model {
         position: Vec2::new(0.0, 0.0),
         radius: 50.0,
         velocity: Vec2::new(2.0, 1.0),
-        color: Rgba::new(1.0, 0.0, 0.0, 0.5),
+        color: Rgba::new(1.0, 0.0, 0.0, 1.0),
     });
     biidamas.push(Biidama {
         position: Vec2::new(20.0, 50.0),
         radius: 30.0,
-        velocity: Vec2::new(20.0, -1.0),
-        color: Rgba::new(0.0, 0.0, 1.0, 0.5),
-    });
-    biidamas.push(Biidama {
-        position: Vec2::new(20.0, 50.0),
-        radius: 30.0,
-        velocity: Vec2::new(4.0, -13.0),
-        color: Rgba::new(1.0, 0.0, 1.0, 0.5),
+        velocity: Vec2::new(20.0, -5.0),
+        color: Rgba::new(0.0, 0.0, 1.0, 1.0),
     });
     return Model {
         biidamas: biidamas,
@@ -104,7 +98,9 @@ fn collided(biidama1: &Biidama, biidama2: &Biidama) -> bool {
     let squared_distance = (biidama1.position.x - biidama2.position.x)
         * (biidama1.position.x - biidama2.position.x)
         + (biidama1.position.y - biidama2.position.y) * (biidama1.position.y - biidama2.position.y);
-    return squared_distance < biidama1.radius + biidama2.radius;
+    let squared_sum_of_radiuses =
+        (biidama1.radius + biidama2.radius) * (biidama1.radius + biidama2.radius);
+    return squared_distance < squared_sum_of_radiuses;
 }
 
 fn view(app: &App, _model: &Model, frame: Frame) {
