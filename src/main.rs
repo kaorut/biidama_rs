@@ -7,6 +7,12 @@ struct Biidama {
     color: Rgba,
 }
 
+impl Biidama {
+    fn _mass(&self) -> f32 {
+        return self.radius;
+    }
+}
+
 struct Model {
     biidamas: Vec<Biidama>,
     fps: usize,
