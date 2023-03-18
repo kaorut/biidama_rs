@@ -9,6 +9,6 @@ pub struct Biidama {
 
 impl Biidama {
     pub fn _mass(&self) -> f32 {
-        return (self.radius * self.radius).sqrt();
+        (self.radius * self.radius).sqrt()
     }
 }
