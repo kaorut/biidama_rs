@@ -58,22 +58,8 @@ fn update(_app: &App, model: &mut Model, _update: Update) {
     let frame_rect = _app.window_rect();
     let velocity_unit = _update.since_last.as_secs_f32() * 100.0;
     for b in &mut model.biidamas {
-        (b.position.x, b.velocity.x) = reflect_on_wall(
-            b.position.x,
-            b.radius,
-            b.velocity.x,
-            velocity_unit,
-            frame_rect.left(),
-            frame_rect.right(),
-        );
-        (b.position.y, b.velocity.y) = reflect_on_wall(
-            b.position.y,
-            b.radius,
-            b.velocity.y,
-            velocity_unit,
-            frame_rect.bottom(),
-            frame_rect.top(),
-        );
+        b.position = b.position + velocity_unit * b.velocity;
+        (b.position, b.velocity) = reflect_on_wall(b, frame_rect, 1.0);
     }
     for i in 0..model.biidamas.len() - 1 {
         for j in i + 1..model.biidamas.len() {
@@ -90,33 +76,66 @@ fn update(_app: &App, model: &mut Model, _update: Update) {
             }
             model.biidamas[i].velocity = v1;
             model.biidamas[j].velocity = v2;
+            while collided(&model.biidamas[i], &model.biidamas[j]) {
+                model.biidamas[i].position =
+                    model.biidamas[i].position + velocity_unit * model.biidamas[i].velocity;
+                model.biidamas[j].position =
+                    model.biidamas[j].position + velocity_unit * model.biidamas[j].velocity;
+            }
         }
     }
 
     model.fps = (1.0 / _update.since_last.as_secs_f32()) as usize;
 }
 
-fn reflect_on_wall(
+fn reflect_on_wall(biidama: &Biidama, frame_rect: Rect, k: f32) -> (Vec2, Vec2) {
+    let (position_x, velocity_x) = reflect_on_wall_impl(
+        biidama.position.x,
+        biidama.radius,
+        biidama.velocity.x,
+        (frame_rect.left(), frame_rect.right()),
+        k,
+    );
+    let (position_y, velocity_y) = reflect_on_wall_impl(
+        biidama.position.y,
+        biidama.radius,
+        biidama.velocity.y,
+        (frame_rect.bottom(), frame_rect.top()),
+        k,
+    );
+    return (
+        Vec2::new(position_x, position_y),
+        Vec2::new(velocity_x, velocity_y),
+    );
+}
+
+fn reflect_on_wall_impl(
     position: f32,
     radius: f32,
     velocity: f32,
-    velocity_unit: f32,
-    frame_first: f32,
-    frame_last: f32,
+    walls: (f32, f32),
+    k: f32,
 ) -> (f32, f32) {
-    let next_position = position + velocity_unit * velocity;
-    if next_position - radius < frame_first {
+    if position - radius < walls.0 {
         return (
-            2.0 * (frame_first + radius) - next_position,
-            if velocity < 0.0 { -velocity } else { velocity },
+            2.0 * (walls.0 + radius) - position,
+            if velocity < 0.0 {
+                -k * velocity
+            } else {
+                velocity
+            },
         );
-    } else if next_position + radius > frame_last {
+    } else if position + radius > walls.1 {
         return (
-            2.0 * (frame_last - radius) - next_position,
-            if velocity > 0.0 { -velocity } else { velocity },
+            2.0 * (walls.1 - radius) - position,
+            if velocity > 0.0 {
+                -k * velocity
+            } else {
+                velocity
+            },
         );
     } else {
-        return (next_position, velocity);
+        return (position, velocity);
     }
 }
 
