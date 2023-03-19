@@ -6,6 +6,7 @@ Biidama for Rust
 $$
 m_1v_1+m_2v_2=m_1v_1'+m_2v_2' \tag{1}
 $$
+
 $$
 -k=\frac{v_2'-v_1'}{v_2-v_1} \tag{2}
 $$
