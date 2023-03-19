@@ -10,6 +10,10 @@ pub fn update(_app: &App, model: &mut model::Model, _update: Update) {
         b.position += velocity_unit * b.velocity;
         (b.position, b.velocity) = reflect_on_wall(b, frame_rect, 1.0);
     }
+    if model.biidamas.len() < 2 {
+        return;
+    }
+    
     for i in 0..model.biidamas.len() - 1 {
         for j in i + 1..model.biidamas.len() {
             let v1: Vec2;
