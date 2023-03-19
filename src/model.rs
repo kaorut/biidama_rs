@@ -1,4 +1,5 @@
 use nannou::prelude::*;
+use rand::prelude::*;
 
 use super::biidama;
 
@@ -9,40 +10,39 @@ pub struct Model {
 
 impl Model {
     pub fn new() -> Model {
-        Model{biidamas: Vec::new(), fps:0}
+        Model {
+            biidamas: Vec::new(),
+            fps: 0,
+        }
     }
 
-    pub fn reset(&mut self) {}
+    pub fn reset(&mut self, rect: Rect<f32>) {
+        let mut rng = rand::thread_rng();
+
+        let mut biidamas: Vec<biidama::Biidama> = Vec::new();
+        let count = rng.gen_range(2u32..=50u32);
+        for _ in 0..count {
+            let position = Vec2::new(
+                rng.gen_range(rect.left()..rect.right()),
+                rng.gen_range(rect.bottom()..rect.top()),
+            );
+            let radius = rng.gen_range(5.0..30.0);
+            let velocity = Vec2::new(rng.gen_range(0.0..5.0), rng.gen_range(0.0..5.0));
+            let color = hsl(rng.gen_range(0.0..1.0), 1.0, 0.5);
+            biidamas.push(biidama::Biidama {
+                position,
+                radius,
+                velocity,
+                color,
+            });
+        }
+
+        self.biidamas = biidamas;
+    }
 }
 
-pub fn model(_: &App) -> Model {
-    // let biidamas = vec![
-    //     biidama::Biidama {
-    //         position: Vec2::new(0.0, 0.0),
-    //         radius: 50.0,
-    //         velocity: Vec2::new(5.0, 2.0),
-    //         color: Rgba::new(1.0, 0.0, 0.0, 1.0),
-    //     },
-    //     biidama::Biidama {
-    //         position: Vec2::new(120.0, 150.0),
-    //         radius: 30.0,
-    //         velocity: Vec2::new(10.0, -2.0),
-    //         color: Rgba::new(0.0, 0.0, 1.0, 1.0),
-    //     },
-    //     biidama::Biidama {
-    //         position: Vec2::new(30.0, 200.0),
-    //         radius: 40.0,
-    //         velocity: Vec2::new(-10.0, 5.0),
-    //         color: Rgba::new(0.0, 0.5, 0.0, 1.0),
-    //     },
-    //     biidama::Biidama {
-    //         position: Vec2::new(40.0, 50.0),
-    //         radius: 20.0,
-    //         velocity: Vec2::new(1.0, -1.0),
-    //         color: Rgba::new(1.0, 0.0, 1.0, 1.0),
-    //     },
-    // ];
+pub fn model(app: &App) -> Model {
     let mut model = Model::new();
-    model.reset();
+    model.reset(app.window_rect());
     model
 }

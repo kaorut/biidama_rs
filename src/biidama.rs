@@ -4,7 +4,7 @@ pub struct Biidama {
     pub position: Vec2,
     pub radius: f32,
     pub velocity: Vec2,
-    pub color: Rgba,
+    pub color: Hsl,
 }
 
 impl Biidama {

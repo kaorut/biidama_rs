@@ -13,7 +13,7 @@ pub fn update(_app: &App, model: &mut model::Model, _update: Update) {
     if model.biidamas.len() < 2 {
         return;
     }
-    
+
     for i in 0..model.biidamas.len() - 1 {
         for j in i + 1..model.biidamas.len() {
             let v1: Vec2;
@@ -29,7 +29,10 @@ pub fn update(_app: &App, model: &mut model::Model, _update: Update) {
             }
             model.biidamas[i].velocity = v1;
             model.biidamas[j].velocity = v2;
-            while collided(&model.biidamas[i], &model.biidamas[j]) {
+            for _ in 0..100 {
+                if !collided(&model.biidamas[i], &model.biidamas[j]) {
+                    break;
+                }
                 model.biidamas[i].position =
                     model.biidamas[i].position + velocity_unit * model.biidamas[i].velocity;
                 model.biidamas[j].position =
